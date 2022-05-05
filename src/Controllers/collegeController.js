@@ -32,9 +32,12 @@ const createCollege = async function (req, res) {
         if(!isValidURL(logoLink)){
            return res.status(400).send({status:false, message:"Logo Link is required!"})
         }
+        let isCollegeNameNotUnique =  await collegeModel.findOne({name : name})
 
-        let isCollegeNameUnique =  await collegeModel.findOne({name : name})
-        if(isCollegeNameUnique){
+        console.log(isCollegeNameNotUnique);
+
+        if(isCollegeNameNotUnique){
+
             return res.status(400).send({status:false, message:"College is already Exists!"})
         }
 

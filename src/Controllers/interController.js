@@ -10,6 +10,7 @@ const isValid = function (value) {
 
 const createIntern = async function(req, res){
     try{
+
         let {name, email, mobile, collegeName} = req.body
 
         if(!isValid(name)){
@@ -20,7 +21,9 @@ const createIntern = async function(req, res){
             return res.status(404).send({status:false, message:"email not found!"})
         }
 
-        let isEmailValid =await emailValidator.validate(email)
+
+        let isEmailValid = emailValidator.validate(email)
+
         if(!isEmailValid){
             return res.status(400).send({status:false, Message:"Email is Invalid!"})
         }
@@ -29,7 +32,16 @@ const createIntern = async function(req, res){
         if(isEmailNotUnique){
             return res.status(400).send({status: false, message: "email already exist"})
         }
-     
+        
+      if(!isValid(collegeName)){
+            return res.status(404).send({status:false, message:"collegeId not found!"})
+        }
+        let isCollege= await collegeModel.findOne({name:collegeName})
+        
+                if(!isCollege){
+                    return res.status(404).send({stsus:false,message:"No college found with given Name!"})
+                }
+
         if(!mobile){
             return res.status(400).send({status: false, message: "mobile must be provided"})
         }
@@ -43,24 +55,15 @@ const createIntern = async function(req, res){
             return res.status(400).send({status: false, message: "mobile number already exist"})
         }
 
-        if(!isValid(collegeName)){
-            return res.status(404).send({status:false, message:"collegeId not found!"})
         
+        const intern =await internModel.create(req.body)
+
+        if(!intern){
+            return res.status(400).send({status:false,mesage:"No intern is Created!"})
         }
 
-        if(collegeName){
-
-            let foundedCollege = await collegeModel.findOne({name:collegeName})
-            if(!foundedCollege){
-                return res.status(404).send({status:false, message:"college not found"})
-            }
-
-            req.body.collegeId = foundedCollege._id
-
-            let internCreated = await internModel.create(req.body)  
-            return res.status(201).send({status:true, data:internCreated})
+        return res.status(200).send({status:true, document:intern})
             
-
         }
     }catch(err){
         res.status(500).send({msg:err.message})
