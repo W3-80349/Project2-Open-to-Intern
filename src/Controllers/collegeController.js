@@ -1,36 +1,47 @@
 const collegeModel = require("../Models/collegeModel")
 const internModel = require("../Models/internModel")
 
+const isValid = function (value) {
+    if (typeof value === "undefined" || typeof value === null) return false
+    if (typeof value === "string" && value.trim().length == 0) return false
+    return true
+}
 
+const isValidURL = function (str) {
+   let  pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+    return !!pattern.test(str);
+}
+    
 const createCollege = async function (req, res) {
  try{
     let {name, fullName, logoLink } = req.body
-    console.log(req.body);
 
-        if(!name){
+        if(!isValid(name)){
             return res.status(400).send({status:false, message:"name is required"})
         }
         
-        if(!fullName){
+        if(!isValid(fullName)){
             return res.status(400).send({status:false, message:"Full name is required!"})
         }
 
-        if(!logoLink){
-            return res.status(400).send({status:false, message:"Logo Link is required!"})
+        if(!isValidURL(logoLink)){
+           return res.status(400).send({status:false, message:"Logo Link is required!"})
         }
 
         let isCollegeNameUnique =  await collegeModel.findOne({name : name})
-
-        console.log(isCollegeNameUnique);
-
         if(isCollegeNameUnique){
             return res.status(400).send({status:false, message:"College is already Exists!"})
         }
 
-    let college = await collegeModel.create(req.body)
-        
+
+    let college = await collegeModel.create(req.body)    
     if(!college){
-        return res.status(400).send({status:false,message:"Intern not created! "})
+        return res.status(400).send({status:false,message:"college not created! "})
     }
 
     return res.status(201).send({status:true, data:college})
@@ -59,7 +70,7 @@ const getCollegeDetails = async function(req, res){
         if(!interns){
             return res.status(404).send({status:false, message:"No interns found!"})
         }
-        return res.status(201).send({status:true, data:college,interests:interns })
+        return res.status(201).send({status:true, data:college,interests:interns})
         
         
     } catch (error) {
