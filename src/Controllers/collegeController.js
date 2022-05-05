@@ -73,7 +73,14 @@ const getCollegeDetails = async function(req, res){
         if(!interns){
             return res.status(404).send({status:false, message:"No interns found!"})
         }
-        return res.status(201).send({status:true, data:college,interests:interns})
+
+        const Data = {
+            name:college.name,
+            fullName:college.fullName,
+            logoLink:college.logoLink,
+            interests:interns
+        }
+        return res.status(201).send({status:true, data:Data})
         
         
     } catch (error) {

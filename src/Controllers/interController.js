@@ -10,7 +10,6 @@ const isValid = function (value) {
 
 const createIntern = async function(req, res){
     try{
-
         let {name, email, mobile, collegeName} = req.body
 
         if(!isValid(name)){
@@ -29,12 +28,13 @@ const createIntern = async function(req, res){
         }
 
         const isEmailNotUnique = await internModel.findOne({email : email})
+
         if(isEmailNotUnique){
             return res.status(400).send({status: false, message: "email already exist"})
         }
         
       if(!isValid(collegeName)){
-            return res.status(404).send({status:false, message:"collegeId not found!"})
+            return res.status(404).send({status:false, message:"collegename is Invalid!"})
         }
         let isCollege= await collegeModel.findOne({name:collegeName})
         
@@ -51,12 +51,21 @@ const createIntern = async function(req, res){
         }
 
         const isMobileNotUnique = await internModel.findOne({mobile : mobile})
+
         if(isMobileNotUnique){
             return res.status(400).send({status: false, message: "mobile number already exist"})
         }
 
+        const newIntern = {
+            name:name,
+            mobile:mobile,
+            email:email,
+            collegeId:isCollege._id,
+        }
+
         
-        const intern =await internModel.create(req.body)
+        const intern =await internModel.create(newIntern)
+      
 
         if(!intern){
             return res.status(400).send({status:false,mesage:"No intern is Created!"})
@@ -65,11 +74,11 @@ const createIntern = async function(req, res){
         return res.status(200).send({status:true, document:intern})
             
         }
-    }catch(err){
+    catch(err){
         res.status(500).send({msg:err.message})
     }
-}
 
+}
 
 
 module.exports.createIntern = createIntern
