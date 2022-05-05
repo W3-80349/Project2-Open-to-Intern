@@ -5,7 +5,7 @@ const emailValidator = require("email-validator")
 
 const createIntern = async function(req, res){
     try{
-        let {name, email, mobile, collegeId} = req.body
+        let {name, email, mobile, collegeId, collegeName} = req.body
 
         if(!name){
             return res.status(404).send({status:false, Message:"Name not found!"})
@@ -15,7 +15,7 @@ const createIntern = async function(req, res){
             return res.status(404).send({status:false, message:"email not found!"})
         }
 
-        let isEmailValid =await emailValidator.validate(email)
+        let isEmailValid = emailValidator.validate(email)
 
         if(!isEmailValid){
             return res.status(400).send({status:false, Message:"Email is Invalid!"})
@@ -28,12 +28,16 @@ const createIntern = async function(req, res){
         
         }
 
-        let isCollegeIdValid = await collegeModel.findById(collegeId)
+        let isCollegeNameValid = await collegeModel.findOne({name:collegeName})
+        
+                if(!isCollegeNameValid){
+                    return res.status(404).send({stsus:false,message:"No college found with given Name!"})
+                }
 
-
-        if(!isCollegeIdValid){
-            return res.status(404).send({stsus:false,message:"College Id is In valid!"})
+        if(isCollegeNameValid.name != collegeName){
+            return res.status(400).send({stsus:false,message:"College Name is Invalid!"})
         }
+
 
         if(!mobile){
             return res.status(400).send({status: false, message: "mobile must be provided"})
@@ -56,13 +60,13 @@ const createIntern = async function(req, res){
         }
 
         
-        const college =await internModel.create(req.body)
+        const intern =await internModel.create(req.body)
 
-        if(!college){
-            return res.status(400).send({status:false,mesage:"No college is Created!"})
+        if(!intern){
+            return res.status(400).send({status:false,mesage:"No intern is Created!"})
         }
 
-        return res.status(200).send({status:true, document:college})
+        return res.status(200).send({status:true, document:intern})
 
     }catch(err){
         res.status(500).send({msg:err.message})
