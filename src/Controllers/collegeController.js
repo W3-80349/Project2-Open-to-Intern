@@ -42,12 +42,12 @@ const createCollege = async function (req, res) {
         }
 
 
-    let college = await collegeModel.create(req.body)    
-    if(!college){
-        return res.status(400).send({status:false,message:"college not created! "})
-    }
+        let college = await collegeModel.create(req.body)    
+        if(!college){
+            return res.status(400).send({status:false,message:"college not created! "})
+        }
 
-    return res.status(201).send({status:true, data:college})
+        return res.status(201).send({status:true, data:college})
 
  }catch(err){
      res.status(500).send({msg:err.message})

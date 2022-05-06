@@ -17,7 +17,7 @@ const createIntern = async function(req, res){
         }
 
         if(!email){
-            return res.status(404).send({status:false, message:"email not found!"})
+            return res.status(400).send({status:false, message:"email not found!"})
         }
 
 
@@ -71,7 +71,7 @@ const createIntern = async function(req, res){
             return res.status(400).send({status:false,mesage:"No intern is Created!"})
         }
 
-        return res.status(200).send({status:true, document:intern})
+        return res.status(201).send({status:true, document:intern})
             
         }
     catch(err){
