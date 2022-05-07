@@ -14,12 +14,17 @@ const isValidURL = function (str) {
         '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
         '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
         '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
-    return !!pattern.test(str);
+    return pattern.test(str);
 }
     
 const createCollege = async function (req, res) {
  try{
+
     let {name, fullName, logoLink } = req.body
+
+        name = name.toLowerCase().trim()
+        fullName = fullName.toLowerCase().trim()
+        console.log(isValidURL(logoLink));
 
         if(!isValid(name)){
             return res.status(400).send({status:false, message:"name is required"})
@@ -34,15 +39,18 @@ const createCollege = async function (req, res) {
         }
         let isCollegeNameNotUnique =  await collegeModel.findOne({name : name})
 
-        console.log(isCollegeNameNotUnique);
-
         if(isCollegeNameNotUnique){
 
             return res.status(400).send({status:false, message:"College is already Exists!"})
         }
+        const collegeObj = {
+            name:name,
+            fullName:fullName,
+            logoLink:logoLink,
+        }
+        console.log(collegeObj);
 
-
-        let college = await collegeModel.create(req.body)    
+        let college = await collegeModel.create(collegeObj)    
         if(!college){
             return res.status(400).send({status:false,message:"college not created! "})
         }
@@ -50,6 +58,7 @@ const createCollege = async function (req, res) {
         return res.status(201).send({status:true, data:college})
 
  }catch(err){
+   
      res.status(500).send({msg:err.message})
  }
 }
@@ -59,8 +68,11 @@ const createCollege = async function (req, res) {
 const getCollegeDetails = async function(req, res){
     try {
         let collegeName = req.query.collegeName
+        if(!collegeName){
+            return res.status(400).send({status:false, message:"no query found"})
+        }
 
-        let college = await collegeModel.findOne({name:collegeName})
+        let college = await collegeModel.findOne({name:collegeName })
         console.log(college);
         if(!college){
             return res.status(404).send({status:false, message:"No college found!"})
